@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AuthRequest;
+use App\Http\Requests\UserCreateRequest;
+use App\Http\Requests\UserUpdateRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Carbon\Carbon;
@@ -12,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -98,35 +101,214 @@ class UserController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     *    @OA\Post(
+     *       path="/user",
+     *       tags={"User"},
+     *       operationId="store-user",
+     *       summary="Add User",
+     *       description="Add new user",
+     *       @OA\RequestBody(
+     *          @OA\MediaType(
+     *              mediaType="multipart/form-data",
+     *              @OA\Schema(
+     *                  type="object",
+     *                  ref="#/components/schemas/UserCreateRequest"
+     *              )
+     *          )
+     *     ),
+     *     @OA\Response(
+     *           response="200",
+     *           description="Success",
+     *           @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
+     *     ),
+     *     @OA\Response(
+     *           response="500",
+     *           description="Failure",
+     *           @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
+     *     ),
+     *     security={
+     *          {"Bearer": {}}
+     *      }
+     * )
      */
-    public function store(Request $request)
+    public function store(UserCreateRequest $request) : JsonResponse
     {
-        //
+        $file_url = null;
+        if($request->hasFile('image')){
+            $request->validate([
+                'image' => 'required|mimes:jpg,jpeg,png,bmp |max:4096',
+            ]);
+            $hash = Str::random(30);
+            $extension = '.'.$request->file('image')->guessExtension();
+            $filenameClient = $hash.$extension;
+            $request->file('image')->storeAs('images/users', $filenameClient, $disk = 'app-public');
+            $file_path = Storage::disk('app-public')->path('images/users', true). '/'.$filenameClient;
+            if (file_exists($file_path)) {
+                $file_url = '/images/users'.'/'.$filenameClient;
+            }
+        }
+        $user = new User;
+        $user->id = Str::uuid();
+        $user->name = $request->name;
+        $user->username = $request->username;
+        $user->phone = $request->phone;
+        $user->password = Hash::make($request->password);
+        $user->image = $file_url;
+        $user->role = $request->role;
+        $user->save();
+        return $this->response(['record' => new UserResource($user)],"Record Saved",200);
     }
 
     /**
-     * Display the specified resource.
+     *    @OA\Get(
+     *       path="/user/{id}",
+     *       tags={"User"},
+     *       operationId="show-user",
+     *       summary="Show User",
+     *       description="Show user",
+     *       @OA\Parameter(
+     *          name="id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Property(
+     *              type="string"
+     *          ),
+     *      ),
+     *     @OA\Response(
+     *           response="200",
+     *           description="Success",
+     *           @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
+     *     ),
+     *     @OA\Response(
+     *           response="500",
+     *           description="Failure",
+     *           @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
+     *     ),
+     *     security={
+     *          {"Bearer": {}}
+     *      }
+     * )
      */
-    public function show(string $id)
+    public function show(string $id) : JsonResponse
     {
-        //
+        $user = User::whereId($id)->firstOrFail();
+        $data['record'] = new UserResource($user);
+        return $this->response($data,"Data Retrieved",200);
     }
 
     /**
-     * Update the specified resource in storage.
+     *    @OA\Put(
+     *       path="/user/{id}",
+     *       tags={"User"},
+     *       operationId="update-user",
+     *       summary="Update User",
+     *       description="Update user by ID",
+     *     @OA\Parameter(
+     *          name="id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Property(
+     *              type="string"
+     *          ),
+     *      ),
+     *       @OA\RequestBody(
+     *          @OA\MediaType(
+     *              mediaType="multipart/form-data",
+     *              @OA\Schema(
+     *                  type="object",
+     *                  ref="#/components/schemas/UserUpdateRequest"
+     *              )
+     *          )
+     *     ),
+     *     @OA\Response(
+     *           response="200",
+     *           description="Success",
+     *           @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
+     *     ),
+     *     @OA\Response(
+     *           response="500",
+     *           description="Failure",
+     *           @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
+     *     ),
+     *     security={
+     *          {"Bearer": {}}
+     *      }
+     * )
      */
-    public function update(Request $request, string $id)
+    public function update(UserUpdateRequest $request, string $id) : JsonResponse
     {
-        //
+        $user = User::whereId($id)->firstOrFail();
+        if (!Hash::check($request->old_password,$user->password)){
+            return $this->response(null,"Invalid Password",403);
+        }
+        if ($request->password && $request->password != ""){
+            $validator = Validator::make($request->all(),[
+                "password" => "required|min:6|max:16|confirmed"
+            ]);
+            if ($validator->fails()){
+                return $this->response($validator->getMessageBag(),"Invalid Entity",400);
+            }
+            $user->password = Hash::make($request->password);
+        }
+        $file_url = $user->image;
+        if($request->hasFile('image')){
+            $request->validate([
+                'image' => 'required|mimes:jpg,jpeg,png,bmp |max:4096',
+            ]);
+            $hash = Str::random(30);
+            $extension = '.'.$request->file('image')->guessExtension();
+            $filenameClient = $hash.$extension;
+            $request->file('image')->storeAs('images/users', $filenameClient, $disk = 'app-public');
+            $file_path = Storage::disk('app-public')->path('images/users', true). '/'.$filenameClient;
+            if (file_exists($file_path)) {
+                $file_url = '/images/users'.'/'.$filenameClient;
+            }
+        }
+        $user->name = $request->name;
+        $user->username = $request->username;
+        $user->phone = $request->phone;
+        $user->image = $file_url;
+        $user->role = $request->role;
+        $user->save();
+        $data['record'] = new UserResource($user);
+        return $this->response($data,"Data Updated",200);
     }
 
     /**
-     * Remove the specified resource from storage.
+     *    @OA\Delete(
+     *       path="/user/{id}",
+     *       tags={"User"},
+     *       operationId="delete-user",
+     *       summary="Delete User",
+     *       description="Delete user by ID",
+     *       @OA\Parameter(
+     *          name="id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Property(
+     *              type="string"
+     *          ),
+     *      ),
+     *     @OA\Response(
+     *           response="200",
+     *           description="Success",
+     *           @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
+     *     ),
+     *     @OA\Response(
+     *           response="500",
+     *           description="Failure",
+     *           @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
+     *     ),
+     *     security={
+     *          {"Bearer": {}}
+     *      }
+     * )
      */
-    public function destroy(string $id)
+    public function destroy(string $id) : JsonResponse
     {
-        //
+        $user = User::whereId($id)->firstOrFail();
+        $user->delete();
+        return $this->response(null,"Record Deleted",200);
     }
 
     /**
