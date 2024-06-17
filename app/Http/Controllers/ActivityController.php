@@ -275,4 +275,48 @@ class ActivityController extends Controller
 
         return $this->response($data,"Data Retrieved",200);
     }
+
+    /**
+     *    @OA\Get(
+     *       path="/activity-date",
+     *       tags={"Acitvity"},
+     *       operationId="index-activity-date",
+     *       summary="Activity Per Date",
+     *       description="Get All Activity By Date",
+     *     @OA\Parameter(
+     *          name="activity_date",
+     *          required=true,
+     *          description="Y-m-d",
+     *          in="query",
+     *          @OA\Property(
+     *              type="string"
+     *          ),
+     *      ),
+     *     @OA\Response(
+     *           response="200",
+     *           description="Success",
+     *           @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
+     *     ),
+     *     @OA\Response(
+     *           response="500",
+     *           description="Failure",
+     *           @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
+     *     ),
+     *     security={
+     *          {"Bearer": {}}
+     *      }
+     * )
+     */
+    public function getByDate(Request $request) : JsonResponse
+    {
+        $validator = Validator::make($request->all(),[
+            'activity_date' => 'required|date_format:Y-m-d'
+        ]);
+        if($validator->fails()) {
+            return $this->response($validator->getMessageBag(),"Invalid input data",400);
+        }
+        $activity = Activity::whereDate($request->activity_date)->get();
+        $data['records'] = ActivityResources::collection($activity);
+        return $this->response($data,"Data Retrieved",200);
+    }
 }
