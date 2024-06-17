@@ -30,5 +30,6 @@ Route::middleware([
         Route::put("/activity/{id}",[ActivityController::class,'update']);
         Route::delete("/activity/{id}",[ActivityController::class,'destroy']);
         Route::get("/activity-month",[ActivityController::class,'getByMonth']);
+        Route::get("/activity-date",[ActivityController::class,'getByDate']);
     });
 });
