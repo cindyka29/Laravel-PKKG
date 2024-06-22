@@ -25,7 +25,7 @@ class UserResource extends JsonResource
             'phone' => $this->phone,
             'role' => $this->role,
             'is_active' => $this->is_active,
-            'image' => $this->image
+            'image' => $this->image == null ? url("/assets/images/default_user.jpg") : url($this->image)
         ];
     }
 }

@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\AbsenceController;
 
 
 Route::middleware([
@@ -31,5 +32,13 @@ Route::middleware([
         Route::delete("/activity/{id}",[ActivityController::class,'destroy']);
         Route::get("/activity-month",[ActivityController::class,'getByMonth']);
         Route::get("/activity-date",[ActivityController::class,'getByDate']);
+
+        // absence
+        Route::post("/absence",[AbsenceController::class,'store']);
+        Route::get("/absence/{id}",[AbsenceController::class,'show']);
+        Route::put("/absence/{id}",[AbsenceController::class,'update']);
+        Route::delete("/absence/{id}",[AbsenceController::class,'destroy']);
+        Route::get("/absence/{activity_id}/activity",[AbsenceController::class,'getUserAbsentByActivity']);
+        Route::get("/absence/not/{activity_id}/activity",[AbsenceController::class,'getUserNotAbsentByActivity']);
     });
 });
