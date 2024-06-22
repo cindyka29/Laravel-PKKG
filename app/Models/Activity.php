@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 /**
+ * 
+ *
  * @property string $id
  * @property string $name
  * @property string|null $note
