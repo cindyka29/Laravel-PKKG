@@ -7,7 +7,7 @@ use Illuminate\Foundation\Http\FormRequest;
 /**
  * @OA\Schema
  */
-class ActivityRequest extends FormRequest
+class ProgramRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,13 +26,11 @@ class ActivityRequest extends FormRequest
     {
         return [
             "name" => 'required',
-            "date" => 'required|date_format:Y-m-d',
-            "program_id" => 'required'
         ];
     }
 
     /**
-     * @OA\Property (
+     * @OA\Property  (
      *     required={"true"}
      * )
      * @var string
@@ -41,24 +39,9 @@ class ActivityRequest extends FormRequest
 
     /**
      * @OA\Property (
-     *     required={"true"},
-     *     description="Y-m-d"
+     *     format="binary"
      * )
      * @var string
      */
-    private string $date;
-
-    /**
-     * @OA\Property
-     * @var string
-     */
-    private string $note;
-
-    /**
-     * @OA\Property  (
-     *     required={"true"}
-     * )
-     * @var string
-     */
-    private string $program_id;
+    private string $image;
 }

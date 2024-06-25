@@ -1,10 +1,13 @@
 <?php
 
+use App\Http\Controllers\IuranController;
+use App\Http\Controllers\KasController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AbsenceController;
+use App\Http\Controllers\ProgramController;
 
 
 Route::middleware([
@@ -32,6 +35,8 @@ Route::middleware([
         Route::delete("/activity/{id}",[ActivityController::class,'destroy']);
         Route::get("/activity-month",[ActivityController::class,'getByMonth']);
         Route::get("/activity-date",[ActivityController::class,'getByDate']);
+        Route::post("/activity/documentation",[ActivityController::class,'addDocumentation']);
+        Route::delete("/activity/documentation/{image_id}",[ActivityController::class,'deleteDocumentation']);
 
         // absence
         Route::post("/absence",[AbsenceController::class,'store']);
@@ -40,5 +45,27 @@ Route::middleware([
         Route::delete("/absence/{id}",[AbsenceController::class,'destroy']);
         Route::get("/absence/{activity_id}/activity",[AbsenceController::class,'getUserAbsentByActivity']);
         Route::get("/absence/not/{activity_id}/activity",[AbsenceController::class,'getUserNotAbsentByActivity']);
+
+        // Iuran
+        Route::post("/iuran",[IuranController::class,'store']);
+        Route::get("/iuran/{id}",[IuranController::class,'show']);
+        Route::put("/iuran/{id}",[IuranController::class,'update']);
+        Route::delete("/iuran/{id}",[IuranController::class,'destroy']);
+        Route::get("/iuran/{activity_id}/activity",[IuranController::class,'getUserIuranByActivity']);
+        Route::get("/iuran/not/{activity_id}/activity",[IuranController::class,'getUserNotIuranByActivity']);
+
+        // Program
+        Route::get("/program",[ProgramController::class,'index']);
+        Route::post("/program",[ProgramController::class,'store']);
+        Route::get("/program/{id}",[ProgramController::class,'show']);
+        Route::post("/program-update/{id}",[ProgramController::class,'update']);
+        Route::delete("/program/{id}",[ProgramController::class,'destroy']);
+
+        //Kas
+        Route::get("/kas",[KasController::class,'index']);
+        Route::post("/kas",[KasController::class,'store']);
+        Route::get("/kas/{id}",[KasController::class,'show']);
+        Route::post("/kas-update/{id}",[KasController::class,'update']);
+        Route::delete("/kas/{id}",[KasController::class,'destroy']);
     });
 });

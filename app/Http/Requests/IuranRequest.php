@@ -7,7 +7,7 @@ use Illuminate\Foundation\Http\FormRequest;
 /**
  * @OA\Schema
  */
-class ActivityRequest extends FormRequest
+class IuranRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,34 +25,11 @@ class ActivityRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "name" => 'required',
-            "date" => 'required|date_format:Y-m-d',
-            "program_id" => 'required'
+            'user_id' => 'required',
+            'activity_id' => 'required',
+            'is_paid' => 'required|boolean'
         ];
     }
-
-    /**
-     * @OA\Property (
-     *     required={"true"}
-     * )
-     * @var string
-     */
-    private string $name;
-
-    /**
-     * @OA\Property (
-     *     required={"true"},
-     *     description="Y-m-d"
-     * )
-     * @var string
-     */
-    private string $date;
-
-    /**
-     * @OA\Property
-     * @var string
-     */
-    private string $note;
 
     /**
      * @OA\Property  (
@@ -60,5 +37,21 @@ class ActivityRequest extends FormRequest
      * )
      * @var string
      */
-    private string $program_id;
+    private string $user_id;
+
+    /**
+     * @OA\Property  (
+     *     required={"true"}
+     * )
+     * @var string
+     */
+    private string $activity_id;
+
+    /**
+     * @OA\Property  (
+     *     required={"true"}
+     * )
+     * @var bool
+     */
+    private bool $is_paid;
 }
