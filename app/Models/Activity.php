@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 /**
@@ -26,6 +27,9 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Activity newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Activity newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Activity query()
+ * @property string|null $program_id
+ * @property-read \App\Models\Program|null $program
+ * @method static \Illuminate\Database\Eloquent\Builder|Activity whereProgramId($value)
  * @mixin \Eloquent
  */
 class Activity extends Model
@@ -39,5 +43,10 @@ class Activity extends Model
     public function documentations(): MorphMany
     {
         return $this->morphMany(Images::class,'imageable');
+    }
+
+    public function program() : BelongsTo
+    {
+        return $this->belongsTo(Program::class,"program_id","id");
     }
 }

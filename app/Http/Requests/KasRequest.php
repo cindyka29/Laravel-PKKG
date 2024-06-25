@@ -7,7 +7,7 @@ use Illuminate\Foundation\Http\FormRequest;
 /**
  * @OA\Schema
  */
-class ActivityRequest extends FormRequest
+class KasRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,9 +25,10 @@ class ActivityRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "name" => 'required',
+            "activity_id" => 'required',
             "date" => 'required|date_format:Y-m-d',
-            "program_id" => 'required'
+            "type" => "required|in:in,out",
+            'image' => 'required|mimes:jpg,jpeg,png,bmp|max:4096'
         ];
     }
 
@@ -37,28 +38,44 @@ class ActivityRequest extends FormRequest
      * )
      * @var string
      */
-    private string $name;
+    private string $activity_id;
+
+    /**
+     * @OA\Property
+     * @var string
+     */
+    private string $keterangan;
+
+    /**
+     * @OA\Property
+     * @var string
+     */
+    private string $tujuan;
 
     /**
      * @OA\Property (
      *     required={"true"},
-     *     description="Y-m-d"
+     *     description="Format: Y-m-d"
      * )
      * @var string
      */
     private string $date;
 
     /**
-     * @OA\Property
-     * @var string
-     */
-    private string $note;
-
-    /**
-     * @OA\Property  (
-     *     required={"true"}
+     * @OA\Property (
+     *     required={"true"},
+     *     description="in || out"
      * )
      * @var string
      */
-    private string $program_id;
+    private string $type;
+
+    /**
+     * @OA\Property (
+     *     required={"true"},
+     *     format="binary"
+     * )
+     * @var string
+     */
+    private string $image;
 }
