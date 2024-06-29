@@ -24,6 +24,8 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  * @method static \Illuminate\Database\Eloquent\Builder|Program whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Program whereUpdatedAt($value)
  * @property-read \App\Models\Images|null $image
+ * @property string|null $note
+ * @method static \Illuminate\Database\Eloquent\Builder|Program whereNote($value)
  * @mixin \Eloquent
  */
 class Program extends Model

@@ -94,6 +94,7 @@ class ProgramController extends Controller
         $program = new Program;
         $program->id = Str::uuid();
         $program->name = $request->name;
+        $program->note = $request->note;
         $program->save();
 
         if ($file_url !== null){
@@ -207,6 +208,7 @@ class ProgramController extends Controller
             }
         }
         $program->name = $request->name;
+        $program->note = $request->note;
         $program->save();
         $image->name = $request->name;
         $image->url = $file_url;

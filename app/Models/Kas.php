@@ -8,13 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 /**
- * 
+ *
  *
  * @property string $id
  * @property string|null $activity_id
  * @property string|null $keterangan
  * @property string|null $tujuan
  * @property string $date
+ * @property float $nominal
  * @property string $type
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -31,6 +32,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  * @method static \Illuminate\Database\Eloquent\Builder|Kas whereTujuan($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Kas whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Kas whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Kas whereNominal($value)
  * @mixin \Eloquent
  */
 class Kas extends Model

@@ -17,6 +17,7 @@ class ProgramResource extends JsonResource
         return [
             "id" => $this->id,
             "name" => $this->name,
+            "note" => $this->note,
             $this->mergeWhen($this->relationLoaded('image'),[
                 "image" => $this->whenLoaded("image",new ImageResources($this->image))
             ]),

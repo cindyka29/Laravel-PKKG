@@ -28,7 +28,8 @@ class KasRequest extends FormRequest
             "activity_id" => 'required',
             "date" => 'required|date_format:Y-m-d',
             "type" => "required|in:in,out",
-            'image' => 'required|mimes:jpg,jpeg,png,bmp|max:4096'
+            'image' => 'required|mimes:jpg,jpeg,png,bmp|max:4096',
+            'nominal' => 'required|numeric'
         ];
     }
 
@@ -60,6 +61,14 @@ class KasRequest extends FormRequest
      * @var string
      */
     private string $date;
+
+    /**
+     * @OA\Property (
+     *     required={"true"}
+     * )
+     * @var float
+     */
+    private float $nominal;
 
     /**
      * @OA\Property (
