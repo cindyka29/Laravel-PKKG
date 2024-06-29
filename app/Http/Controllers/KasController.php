@@ -2,15 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\KasExportXls;
 use App\Http\Requests\KasRequest;
+use App\Http\Resources\ActivityResources;
 use App\Http\Resources\KasResource;
+use App\Models\Activity;
 use App\Models\Images;
 use App\Models\Kas;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 
 class KasController extends Controller
 {
@@ -117,6 +122,7 @@ class KasController extends Controller
         $kas->keterangan = $request->keterangan;
         $kas->tujuan = $request->tujuan;
         $kas->date = $request->date;
+        $kas->nominal = $request->nominal;
         $kas->type = $request->type;
         $kas->save();
 
@@ -232,6 +238,7 @@ class KasController extends Controller
         $kas->keterangan = $request->keterangan;
         $kas->tujuan = $request->tujuan;
         $kas->date = $request->date;
+        $kas->nominal = $request->nominal;
         $kas->type = $request->type;
         $kas->save();
 
@@ -282,5 +289,145 @@ class KasController extends Controller
         $kas = Kas::whereId($id)->firstOrFail();
         $kas->delete();
         return $this->response(null,"Data Deleted",200);
+    }
+
+    /**
+     * @param $activity_id
+     * @return JsonResponse
+     * @OA\Get   (
+     *     path="/kas/activity/{activity_id}",
+     *     tags={"Kas"},
+     *     operationId="get-kas-activity",
+     *     summary="Get Kas by Activity ID",
+     *     description="Get Kas by Activity ID",
+     *     @OA\Parameter (
+     *          name="activity_id",
+     *          required=true,
+     *          description="Activity ID",
+     *          in="path",
+     *          @OA\Schema (
+     *              type="string"
+     *          ),
+     *     ),
+     *     @OA\Response(
+     *          response="200",
+     *          description="Success",
+     *          @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
+     *     ),
+     *     @OA\Response(
+     *          response="500",
+     *          description="Failure",
+     *          @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
+     *     ),
+     *     security={
+     *          {"Bearer": {}}
+     *     }
+     * )
+     */
+    public function getByActivityId($activity_id) : JsonResponse
+    {
+        $activity = Activity::whereId($activity_id)->firstOrFail();
+        $kas = Kas::with(["image"])->where("activity_id","=",$activity_id)->get();
+        $data["activity"] = new ActivityResources($activity);
+        $data["kas"] = KasResource::collection($kas);
+        return $this->response($data,"Data Retrieved",200);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Get   (
+     *     path="/kas/month",
+     *     tags={"Kas"},
+     *     operationId="get-kas-month",
+     *     summary="Get Kas Months",
+     *     description="Get Kas Months",
+     *     @OA\Parameter (
+     *          name="year",
+     *          required=false,
+     *          description="YYYY(2005)",
+     *          in="query",
+     *          @OA\Schema (
+     *              type="string"
+     *          ),
+     *     ),
+     *     @OA\Response(
+     *          response="200",
+     *          description="Success",
+     *          @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
+     *     ),
+     *     @OA\Response(
+     *          response="500",
+     *          description="Failure",
+     *          @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
+     *     ),
+     *     security={
+     *          {"Bearer": {}}
+     *     }
+     * )
+     */
+    public function getMonthKas(Request $request) : JsonResponse
+    {
+        $validator = Validator::make($request->all(),[
+            "year" => "date_format:Y|nullable"
+        ]);
+        if($validator->fails()){
+            return $this->response($validator->getMessageBag(),"Invalid Input",400);
+        }
+        $year = $request->year;
+        $months = Kas::selectRaw("DISTINCT(DATE_FORMAT(date,'%M %Y')) as text, DATE_FORMAT(date,'%Y-%m') as value")
+        ->where(function($q) use ($year){
+            if ($year && $year != ""){
+                $q->whereRaw("DATE_FORMAT(date,'%Y') = '$year'");
+            }
+        })->get();
+        $data["records"] = $months;
+        return $this->response($data,"Data Retrieved",200);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\BinaryFileResponse
+     * @OA\Get   (
+     *     path="/kas/month/xls",
+     *     tags={"Kas"},
+     *     operationId="get-kas-month-export",
+     *     summary="Get Report Kas To Excel",
+     *     description="Get Report Kas To Excel",
+     *     @OA\Parameter (
+     *          name="month",
+     *          required=true,
+     *          description="YYYY-mm(2005-05)",
+     *          in="query",
+     *          @OA\Schema (
+     *              type="string"
+     *          ),
+     *     ),
+     *     @OA\Response(
+     *          response="200",
+     *          description="Success",
+     *          @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
+     *     ),
+     *     @OA\Response(
+     *          response="500",
+     *          description="Failure",
+     *          @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
+     *     ),
+     *     security={
+     *          {"Bearer": {}}
+     *     }
+     * )
+     */
+    public function exportKas(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse|JsonResponse
+    {
+        $validator = Validator::make($request->all(),[
+            "month" => "required|date_format:Y-m"
+        ]);
+        if ($validator->fails()){
+            return $this->response($validator->getMessageBag(),"invalid input",400);
+        }
+        $records = Kas::with("activity")->whereRaw("DATE_FORMAT(date,'%Y-%m') = '$request->month'")->get();
+        $date = Carbon::createFromFormat("Y-m",$request->month)->format("F Y");
+        return Excel::download(new KasExportXls($date,$records),'Laporan-Kas-'.$date.'.xlsx');
     }
 }

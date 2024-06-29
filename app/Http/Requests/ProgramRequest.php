@@ -38,6 +38,12 @@ class ProgramRequest extends FormRequest
     private string $name;
 
     /**
+     * @OA\Property
+     * @var string
+     */
+    private string $note;
+
+    /**
      * @OA\Property (
      *     format="binary"
      * )

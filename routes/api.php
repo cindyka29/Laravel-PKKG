@@ -62,10 +62,14 @@ Route::middleware([
         Route::delete("/program/{id}",[ProgramController::class,'destroy']);
 
         //Kas
+        Route::get("/kas/month/xls",[KasController::class,"exportKas"]);
+        Route::get("/kas/month",[KasController::class,"getMonthKas"]);
+        Route::get("/kas/activity/{activity_id}",[KasController::class,"getByActivityId"]);
         Route::get("/kas",[KasController::class,'index']);
         Route::post("/kas",[KasController::class,'store']);
         Route::get("/kas/{id}",[KasController::class,'show']);
         Route::post("/kas-update/{id}",[KasController::class,'update']);
         Route::delete("/kas/{id}",[KasController::class,'destroy']);
+
     });
 });

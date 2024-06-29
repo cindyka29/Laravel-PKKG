@@ -23,6 +23,7 @@ class KasResource extends JsonResource
             'keterangan' => $this->keterangan,
             'tujuan' => $this->tujuan,
             'date' => $this->date,
+            "nominal" => $this->nominal,
             "type" => $this->type,
             $this->mergeWhen($this->relationLoaded('image'),[
                 "image" => $this->whenLoaded("image",new ImageResources($this->image))

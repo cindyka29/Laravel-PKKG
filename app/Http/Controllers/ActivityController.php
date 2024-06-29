@@ -48,9 +48,7 @@ class ActivityController extends Controller
      */
     public function index(Request $request) : JsonResponse
     {
-        $limit = $request->get("limit") ?? 10;
-        $now = Carbon::now();
-        $activities = Activity::with("program")->where("date",">=",$now->format("Y-m-d"))->limit($limit)->get();
+        $activities = Activity::with("program")->get();
         $data['records'] = ActivityResources::collection($activities);
         return $this->response($data,"Data Retrieved",200);
     }
