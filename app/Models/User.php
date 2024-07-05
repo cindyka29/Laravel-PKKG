@@ -43,6 +43,8 @@ use Laravel\Passport\HasApiTokens;
  * @method static \Illuminate\Database\Eloquent\Builder|User whereUsername($value)
  * @property string|null $image
  * @method static \Illuminate\Database\Eloquent\Builder|User whereImage($value)
+ * @property string|null $jabatan
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereJabatan($value)
  * @mixin \Eloquent
  */
 class User extends Authenticatable

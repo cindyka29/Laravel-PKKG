@@ -29,7 +29,8 @@ class UserCreateRequest extends FormRequest
             "username" => "required|unique:users,username",
             "phone" => "required|unique:users,phone",
             "password" => "required|min:6|max:16|confirmed",
-            "role" => 'required|in:admin,user'
+            "role" => 'required|in:admin,user',
+            "jabatan" => 'required_if:role,user'
         ];
     }
 
@@ -88,4 +89,10 @@ class UserCreateRequest extends FormRequest
      * @var string
      */
     private string $role;
+
+    /**
+     * @OA\Property
+     * @var string
+     */
+    private string $jabatan;
 }

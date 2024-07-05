@@ -24,6 +24,7 @@ class UserResource extends JsonResource
             'username' => $this->username,
             'phone' => $this->phone,
             'role' => $this->role,
+            "jatabatan" => $this->jabatan,
             'is_active' => $this->is_active,
             'image' => $this->image == null ? url("/assets/images/default_user.jpg") : url($this->image)
         ];

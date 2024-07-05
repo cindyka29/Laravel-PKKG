@@ -48,6 +48,7 @@ Route::middleware([
 
         // Iuran
         Route::post("/iuran",[IuranController::class,'store']);
+        Route::get("/iuran/user/{user_id}",[IuranController::class,'index']);
         Route::get("/iuran/{id}",[IuranController::class,'show']);
         Route::put("/iuran/{id}",[IuranController::class,'update']);
         Route::delete("/iuran/{id}",[IuranController::class,'destroy']);
@@ -64,6 +65,7 @@ Route::middleware([
         //Kas
         Route::get("/kas/month/xls",[KasController::class,"exportKas"]);
         Route::get("/kas/month",[KasController::class,"getMonthKas"]);
+        Route::get("/kas/user/{user_id}",[KasController::class,'getByUser']);
         Route::get("/kas/activity/{activity_id}",[KasController::class,"getByActivityId"]);
         Route::get("/kas",[KasController::class,'index']);
         Route::post("/kas",[KasController::class,'store']);
