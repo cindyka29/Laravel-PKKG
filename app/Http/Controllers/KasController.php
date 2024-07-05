@@ -437,7 +437,7 @@ class KasController extends Controller
      * @OA\Get  (
      *     path="/kas/user/{user_id}",
      *     tags={"Kas"},
-     *     operationId="show-iuran-user",
+     *     operationId="show-kas-user",
      *     summary="Get Iuran by User ID",
      *     description="Get Iuran by User ID",
      *     @OA\Parameter (
