@@ -430,44 +430,4 @@ class KasController extends Controller
         $date = Carbon::createFromFormat("Y-m",$request->month)->format("F Y");
         return Excel::download(new KasExportXls($date,$records),'Laporan-Kas-'.$date.'.xlsx');
     }
-
-    /**
-     * @param $user_id
-     * @return JsonResponse
-     * @OA\Get  (
-     *     path="/kas/user/{user_id}",
-     *     tags={"Kas"},
-     *     operationId="show-kas-user",
-     *     summary="Get Iuran by User ID",
-     *     description="Get Iuran by User ID",
-     *     @OA\Parameter (
-     *          name="user_id",
-     *          required=true,
-     *          description="User ID",
-     *          in="path",
-     *          @OA\Schema (
-     *              type="string"
-     *          ),
-     *     ),
-     *     @OA\Response(
-     *          response="200",
-     *          description="Success",
-     *          @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
-     *     ),
-     *     @OA\Response(
-     *          response="500",
-     *          description="Failure",
-     *          @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
-     *     ),
-     *     security={
-     *          {"Bearer": {}}
-     *     }
-     * )
-     */
-    public function getByUser($user_id) : JsonResponse
-    {
-        $users = Kas::with("activity")->where('user_id','=',$user_id)->get();
-        $data["records"] = KasResource::collection($users);
-        return $this->response($data,"Data Retrieved",200);
-    }
 }

@@ -39,6 +39,7 @@ Route::middleware([
         Route::delete("/activity/documentation/{image_id}",[ActivityController::class,'deleteDocumentation']);
 
         // absence
+        Route::get("/absence/user/{user_id}",[AbsenceController::class,'index']);
         Route::post("/absence",[AbsenceController::class,'store']);
         Route::get("/absence/{id}",[AbsenceController::class,'show']);
         Route::put("/absence/{id}",[AbsenceController::class,'update']);
@@ -65,7 +66,6 @@ Route::middleware([
         //Kas
         Route::get("/kas/month/xls",[KasController::class,"exportKas"]);
         Route::get("/kas/month",[KasController::class,"getMonthKas"]);
-        Route::get("/kas/user/{user_id}",[KasController::class,'getByUser']);
         Route::get("/kas/activity/{activity_id}",[KasController::class,"getByActivityId"]);
         Route::get("/kas",[KasController::class,'index']);
         Route::post("/kas",[KasController::class,'store']);
