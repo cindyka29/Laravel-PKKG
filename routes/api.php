@@ -39,6 +39,7 @@ Route::middleware([
         Route::delete("/activity/documentation/{image_id}",[ActivityController::class,'deleteDocumentation']);
 
         // absence
+        Route::get("/absence/user/{user_id}",[AbsenceController::class,'index']);
         Route::post("/absence",[AbsenceController::class,'store']);
         Route::get("/absence/{id}",[AbsenceController::class,'show']);
         Route::put("/absence/{id}",[AbsenceController::class,'update']);

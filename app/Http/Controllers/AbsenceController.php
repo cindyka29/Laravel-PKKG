@@ -15,10 +15,45 @@ use Illuminate\Support\Str;
 
 class AbsenceController extends Controller
 {
-//    public function index(Request $request) : JsonResponse
-//    {
-//
-//    }
+    /**
+     * @param $user_id
+     * @return JsonResponse
+     * @OA\Get  (
+     *     path="/absence/user/{user_id}",
+     *     tags={"Absence"},
+     *     operationId="show-absence-user",
+     *     summary="Get Absence by User ID",
+     *     description="Get Absence by User ID",
+     *     @OA\Parameter (
+     *          name="user_id",
+     *          required=true,
+     *          description="User ID",
+     *          in="path",
+     *          @OA\Schema (
+     *              type="string"
+     *          ),
+     *     ),
+     *     @OA\Response(
+     *          response="200",
+     *          description="Success",
+     *          @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
+     *     ),
+     *     @OA\Response(
+     *          response="500",
+     *          description="Failure",
+     *          @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
+     *     ),
+     *     security={
+     *          {"Bearer": {}}
+     *     }
+     * )
+     */
+    public function index($user_id) : JsonResponse
+    {
+        $users = Absence::with("activity")->where("user_id",'=',$user_id)->get();
+        $data['records'] = AbsenceResource::collection($users);
+        return $this->response($data,"Data Retrieved",200);
+    }
 
     /**
      * @param AbsenceRequest $request
