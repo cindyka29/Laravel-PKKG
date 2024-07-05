@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 /**
- *
+ * 
  *
  * @property string $id
  * @property string|null $activity_id

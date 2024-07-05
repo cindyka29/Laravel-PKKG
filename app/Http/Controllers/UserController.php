@@ -154,6 +154,7 @@ class UserController extends Controller
         $user->phone = $request->phone;
         $user->password = Hash::make($request->password);
         $user->image = $file_url;
+        $user->jabatan = $request->jabatan ?? null;
         $user->role = $request->role;
         $user->save();
         return $this->response(['record' => new UserResource($user)],"Record Saved",200);
@@ -268,6 +269,7 @@ class UserController extends Controller
         $user->username = $request->username;
         $user->phone = $request->phone;
         $user->image = $file_url;
+        $user->jabatan = $request->jabatan ?? null;
         $user->role = $request->role;
         $user->save();
         $data['record'] = new UserResource($user);

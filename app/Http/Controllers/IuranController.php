@@ -16,12 +16,44 @@ use Illuminate\Support\Str;
 class IuranController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * @param $user_id
+     * @return JsonResponse
+     * @OA\Get  (
+     *     path="/iuran/user/{user_id}",
+     *     tags={"Iuran"},
+     *     operationId="show-iuran-user",
+     *     summary="Get Iuran by User ID",
+     *     description="Get Iuran by User ID",
+     *     @OA\Parameter (
+     *          name="user_id",
+     *          required=true,
+     *          description="User ID",
+     *          in="path",
+     *          @OA\Schema (
+     *              type="string"
+     *          ),
+     *     ),
+     *     @OA\Response(
+     *          response="200",
+     *          description="Success",
+     *          @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
+     *     ),
+     *     @OA\Response(
+     *          response="500",
+     *          description="Failure",
+     *          @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
+     *     ),
+     *     security={
+     *          {"Bearer": {}}
+     *     }
+     * )
      */
-//    public function index()
-//    {
-//        //
-//    }
+    public function index($user_id) : JsonResponse
+    {
+        $users = Iuran::with("activity")->where("user_id",'=',$user_id)->get();
+        $data['records'] = IuranResource::collection($users);
+        return $this->response($data,"Data Retrieved",200);
+    }
 
     /**
      * @param IuranRequest $request

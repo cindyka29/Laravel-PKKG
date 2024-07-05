@@ -30,7 +30,8 @@ class UserUpdateRequest extends FormRequest
             "phone" => "required|unique:users,phone,".$this->id,
             "name" => "required",
             "old_password" => "required",
-            "role" => "required|in:admin,user"
+            "role" => "required|in:admin,user",
+            "jabatan" => "required_if:role,user"
         ];
 
     }
@@ -102,4 +103,10 @@ class UserUpdateRequest extends FormRequest
      * @var string
      */
     private string $role;
+
+    /**
+     * @OA\Property
+     * @var string
+     */
+    private string $jabatan;
 }
