@@ -198,7 +198,7 @@ class UserController extends Controller
     }
 
     /**
-     *    @OA\Put(
+     *    @OA\Post(
      *       path="/user/{id}",
      *       tags={"User"},
      *       operationId="update-user",

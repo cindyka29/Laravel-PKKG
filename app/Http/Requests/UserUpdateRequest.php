@@ -25,7 +25,6 @@ class UserUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "id" => "required",
             "username" => "required|unique:users,username,".$this->id,
             "phone" => "required|unique:users,phone,".$this->id,
             "name" => "required",
@@ -38,11 +37,11 @@ class UserUpdateRequest extends FormRequest
 
     /**
      * @OA\Property (
-     *     required={"true"}
+     *     example="PUT"
      * )
      * @var string
      */
-    private string $name;
+    private string $_method;
 
     /**
      * @OA\Property (
@@ -50,7 +49,7 @@ class UserUpdateRequest extends FormRequest
      * )
      * @var string
      */
-    private string $id;
+    private string $name;
 
     /**
      * @OA\Property (
