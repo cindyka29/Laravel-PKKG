@@ -64,6 +64,7 @@ Route::middleware([
         Route::delete("/program/{id}",[ProgramController::class,'destroy']);
 
         //Kas
+        Route::get("/kas/report",[KasController::class,'reportKas']);
         Route::get("/kas/month/xls",[KasController::class,"exportKas"]);
         Route::get("/kas/month",[KasController::class,"getMonthKas"]);
         Route::get("/kas/activity/{activity_id}",[KasController::class,"getByActivityId"]);
