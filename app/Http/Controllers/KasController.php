@@ -430,4 +430,78 @@ class KasController extends Controller
         $date = Carbon::createFromFormat("Y-m",$request->month)->format("F Y");
         return Excel::download(new KasExportXls($date,$records),'Laporan-Kas-'.$date.'.xlsx');
     }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Get   (
+     *     path="/kas/report",
+     *     tags={"Kas"},
+     *     operationId="get-kas-report",
+     *     summary="Get Report Kas",
+     *     description="Get Report",
+     *     @OA\Parameter (
+     *          name="start_date",
+     *          required=false,
+     *          description="YYYY-mm-dd(2005-05-23)",
+     *          in="query",
+     *          @OA\Schema (
+     *              type="string"
+     *          ),
+     *     ),
+     *     @OA\Parameter (
+     *          name="end_date",
+     *          required=false,
+     *          description="YYYY-mm-dd(2005-05-23)",
+     *          in="query",
+     *          @OA\Schema (
+     *              type="string"
+     *          ),
+     *     ),
+     *     @OA\Response(
+     *          response="200",
+     *          description="Success",
+     *          @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
+     *     ),
+     *     @OA\Response(
+     *          response="500",
+     *          description="Failure",
+     *          @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
+     *     ),
+     *     security={
+     *          {"Bearer": {}}
+     *     }
+     * )
+     */
+    public function reportKas(Request $request) : JsonResponse
+    {
+        $validator = Validator::make($request->all(),[
+            "start_date" => "nullable|date_format:Y-m-d",
+        ]);
+        if($validator->fails()){
+            return $this->response($validator->getMessageBag(),"Invalid Input Data",400);
+        }
+        $start_date = $request->get("start_date") ?? null;
+        if ($start_date !== null) {
+            $validator = Validator::make($request->all(),[
+                "end_date" => "required|date_format:Y-m-d"
+            ]);
+            if($validator->fails()){
+                return $this->response($validator->getMessageBag(),"Invalid Input Data",400);
+            }
+        }
+        $end_date = $request->get("end_date") ?? null;
+        $query = Kas::selectRaw("sum(nominal) as nominal, date")
+            ->where(function($q) use ($start_date,$end_date){
+                if ($start_date !== null && $end_date !== null){
+                    $q->whereBetween('date',[$start_date,$end_date]);
+                }
+            })
+            ->groupBy("date");
+        $in = $query->where("type",'=','in')->get();
+        $out = $query->where("type",'=','out')->get();
+        $data['in'] = $in;
+        $data["out"] = $out;
+        return $this->response($data,"Data Retrieved",200);
+    }
 }
