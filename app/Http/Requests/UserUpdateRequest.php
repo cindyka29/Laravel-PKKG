@@ -28,7 +28,6 @@ class UserUpdateRequest extends FormRequest
             "username" => "required|unique:users,username,".$this->id,
             "phone" => "required|unique:users,phone,".$this->id,
             "name" => "required",
-            "old_password" => "required",
             "role" => "required|in:admin,user",
             "jabatan" => "required_if:role,user"
         ];
@@ -69,26 +68,6 @@ class UserUpdateRequest extends FormRequest
 
     /**
      * @OA\Property (
-     *     required={"true"}
-     * )
-     * @var string
-     */
-    private string $old_password;
-
-    /**
-     * @OA\Property
-     * @var string
-     */
-    private string $password;
-
-    /**
-     * @OA\Property
-     * @var string
-     */
-    private string $password_confirmation;
-
-    /**
-     * @OA\Property (
      *     format="binary"
      * )
      * @var string
@@ -108,4 +87,16 @@ class UserUpdateRequest extends FormRequest
      * @var string
      */
     private string $jabatan;
+
+    /**
+     * @OA\Property
+     * @var string
+     */
+    private string $password;
+
+    /**
+     * @OA\Property
+     * @var string
+     */
+    private string $confirm_password;
 }

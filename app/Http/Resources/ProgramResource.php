@@ -23,7 +23,8 @@ class ProgramResource extends JsonResource
             ]),
             $this->mergeWhen($this->relationLoaded('activities'),[
                 "activities" => $this->whenLoaded("activities",ActivityResources::collection($this->activities))
-            ])
+            ]),
+            "updated_at" => $this->updated_at
         ];
     }
 }
