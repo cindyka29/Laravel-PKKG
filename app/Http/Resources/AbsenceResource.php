@@ -23,7 +23,8 @@ class AbsenceResource extends JsonResource
             "activity_id" => $this->activity_id,
             $this->mergeWhen($this->relationLoaded('activity'),[
                 "activity" => $this->whenLoaded("activity",new ActivityResources($this->activity))
-            ])
+            ]),
+            "updated_at" => $this->updated_at
         ];
     }
 }

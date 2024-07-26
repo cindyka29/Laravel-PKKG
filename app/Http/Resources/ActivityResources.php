@@ -25,7 +25,8 @@ class ActivityResources extends JsonResource
             ]),
             $this->mergeWhen($this->relationLoaded('documentations'),[
                 "documentations" => $this->whenLoaded("documentations",ImageResources::collection($this->documentations))
-            ])
+            ]),
+            "updated_at" => $this->updated_at
         ];
     }
 }

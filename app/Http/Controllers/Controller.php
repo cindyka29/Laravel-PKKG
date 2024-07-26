@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Carbon;
+
 /**
  * @OA\Info(
  *      version="1.0",
@@ -24,6 +26,6 @@ abstract class Controller
     {
         $response['response'] = array('status' => $code, 'message' => $message);
         $response['data'] = $data;
-        return response()->json($response, $code);
+        return response()->json($response, $code,["lastUpdate" => Carbon::now()->format("Y-m-d H:i:s")]);
     }
 }

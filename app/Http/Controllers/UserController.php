@@ -239,18 +239,6 @@ class UserController extends Controller
     public function update(UserUpdateRequest $request, string $id) : JsonResponse
     {
         $user = User::whereId($id)->firstOrFail();
-        if (!Hash::check($request->old_password,$user->password)){
-            return $this->response(null,"Invalid Password",403);
-        }
-        if ($request->password && $request->password != ""){
-            $validator = Validator::make($request->all(),[
-                "password" => "required|min:6|max:16|confirmed"
-            ]);
-            if ($validator->fails()){
-                return $this->response($validator->getMessageBag(),"Invalid Entity",400);
-            }
-            $user->password = Hash::make($request->password);
-        }
         $file_url = $user->image;
         if($request->hasFile('image')){
             $request->validate([
@@ -264,6 +252,15 @@ class UserController extends Controller
             if (file_exists($file_path)) {
                 $file_url = '/images/users'.'/'.$filenameClient;
             }
+        }
+        if ($request->password != null && $request->password != ""){
+            $validator = Validator::make($request->all(),[
+                "confirm_password" => "required|same:password"
+            ]);
+            if ($validator->fails()){
+                return $this->response($validator->getMessageBag(),"Invalid input",400);
+            }
+            $user->password = Hash::make($request->password);
         }
         $user->name = $request->name;
         $user->username = $request->username;
@@ -432,5 +429,43 @@ class UserController extends Controller
             $token->delete();
         }
         return $this->response(null, "Logout success",200);
+    }
+
+    /**
+     *    @OA\Post(
+     *       path="/user/reset-password/{id}",
+     *       tags={"User"},
+     *       operationId="user-reset-password",
+     *       summary="Reset Password User",
+     *       description="Resest Password User by ID",
+     *     @OA\Parameter(
+     *          name="id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Property(
+     *              type="string"
+     *          ),
+     *      ),
+     *     @OA\Response(
+     *           response="200",
+     *           description="Success",
+     *           @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
+     *     ),
+     *     @OA\Response(
+     *           response="500",
+     *           description="Failure",
+     *           @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
+     *     ),
+     *     security={
+     *          {"Bearer": {}}
+     *      }
+     * )
+     */
+    public function resetPassword($id) : JsonResponse
+    {
+        $user = User::whereId($id)->firstOrFail();
+        $user->password = Hash::make("123456");
+        $user->save();
+        return $this->response(null,"Reset Password success",200);
     }
 }
