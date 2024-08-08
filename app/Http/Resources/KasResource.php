@@ -17,7 +17,7 @@ class KasResource extends JsonResource
         return [
             'id' => $this->id,
             'activity_id' => $this->activity_id,
-            $this->mergeWhen(isset($this->activity),[
+            $this->mergeWhen($this->realtionLoaded("activity"),[
                 "activity" => new ActivityResources($this->whenLoaded("activity"))
             ]),
             'keterangan' => $this->keterangan,
@@ -25,7 +25,7 @@ class KasResource extends JsonResource
             'date' => $this->date,
             "nominal" => $this->nominal,
             "type" => $this->type,
-            $this->mergeWhen(isset($this->image),[
+            $this->mergeWhen($this->relationLoaded("image"),[
                 "image" => new ImageResources($this->whenLoaded("image"))
             ]),
             "updated_at" => $this->updated_at
