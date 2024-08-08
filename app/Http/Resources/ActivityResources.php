@@ -20,8 +20,12 @@ class ActivityResources extends JsonResource
             'note' => $this->note,
             'date' => $this->date,
             'program_id' => $this->program_id,
-            "program" => $this->whenLoaded("program",new ProgramResource($this->program),null),
-            "documentations" => $this->whenLoaded("documentations",ImageResources::collection($this->documentations),[]),
+            $this->mergeWhen($this->relationLoaded('program'),[
+                "program" => new ProgramResource($this->whenLoaded("program"))
+            ]),
+            $this->mergeWhen($this->relationLoaded('documentations'),[
+                "documentations" => ImageResources::collection($this->whenLoaded("documentations"))
+            ]),
             "updated_at" => $this->updated_at
         ];
     }
