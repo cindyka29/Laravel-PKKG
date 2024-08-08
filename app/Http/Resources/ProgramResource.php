@@ -19,10 +19,10 @@ class ProgramResource extends JsonResource
             "name" => $this->name,
             "note" => $this->note,
             $this->mergeWhen(isset($this->image),[
-                "image" => $this->whenLoaded("image",new ImageResources($this->image))
+                "image" => new ImageResources($this->whenLoaded("image"))
             ]),
             $this->mergeWhen(isset($this->activities),[
-                "activities" => $this->whenLoaded("activities",ActivityResources::collection($this->activities))
+                "activities" => ActivityResources::collection($this->whenLoaded("activities"))
             ]),
             "updated_at" => $this->updated_at
         ];
