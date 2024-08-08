@@ -17,11 +17,11 @@ class AbsenceResource extends JsonResource
         return [
             "is_attended" => $this->is_attended,
             "user_id" => $this->user_id,
-            $this->mergeWhen($this->relationLoaded('user'),[
+            $this->mergeWhen(isset($this->user),[
                 'user' => $this->whenLoaded("user",new UserResource($this->user))
             ]),
             "activity_id" => $this->activity_id,
-            $this->mergeWhen($this->relationLoaded('activity'),[
+            $this->mergeWhen(isset($this->activity),[
                 "activity" => $this->whenLoaded("activity",new ActivityResources($this->activity))
             ]),
             "updated_at" => $this->updated_at
