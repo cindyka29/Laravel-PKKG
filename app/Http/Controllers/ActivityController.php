@@ -48,7 +48,7 @@ class ActivityController extends Controller
      */
     public function index(Request $request) : JsonResponse
     {
-        $activities = Activity::with("program")->get();
+        $activities = Activity::with(["program","documentations"])->get();
         $data['records'] = ActivityResources::collection($activities);
         return $this->response($data,"Data Retrieved",200);
     }
