@@ -24,6 +24,7 @@ Route::middleware([
         Route::get("/user",[UserController::class,'index']);
         Route::post("/user",[UserController::class,'store']);
         Route::post("/user/reset-password/{id}",[UserController::class,'resetPassword']);
+        Route::post("/user/status/{id}",[UserController::class,'updateStatus']);
         Route::get("/user/{id}",[UserController::class,"show"]);
         Route::put("/user/{id}",[UserController::class,"update"]);
         Route::delete("/user/{id}",[UserController::class,"destroy"]);
@@ -56,6 +57,7 @@ Route::middleware([
         Route::delete("/iuran/{id}",[IuranController::class,'destroy']);
         Route::get("/iuran/{activity_id}/activity",[IuranController::class,'getUserIuranByActivity']);
         Route::get("/iuran/not/{activity_id}/activity",[IuranController::class,'getUserNotIuranByActivity']);
+        Route::get("/iuran/month/xls",[IuranController::class,"exportIuran"]);
 
         // Program
         Route::get("/program",[ProgramController::class,'index']);

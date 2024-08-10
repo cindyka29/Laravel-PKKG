@@ -12,6 +12,10 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
+use App\Exports\IuranExportXls;
 
 class IuranController extends Controller
 {
@@ -317,5 +321,25 @@ class IuranController extends Controller
         $data['users'] = UserResource::collection($user);
         $data['activity'] = new ActivityResources($activity);
         return  $this->response($data,"Data Retrieved",200);
+    }
+
+    public function exportIuran(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse|JsonResponse
+    // public function exportIuran(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(),[
+            "month" => "required|date_format:Y-m"
+        ]);
+        if ($validator->fails()){
+            return $this->response($validator->getMessageBag(),"invalid input",400);
+        }
+        $records = Iuran::with('activity')
+        ->whereHas('activity', function ($query) use ($request) {
+            $query->whereYear('date', '=', Carbon::parse($request->month)->year)
+                ->whereMonth('date', '=', Carbon::parse($request->month)->month);
+        })
+        ->get();
+        $date = Carbon::createFromFormat("Y-m",$request->month)->format("F Y");
+        return Excel::download(new IuranExportXls($date,$records),'Laporan-Iuran-'.$date.'.xlsx');
+        // return  $this->response($records,"Data Retrieved",200);
     }
 }

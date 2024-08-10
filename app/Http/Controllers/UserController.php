@@ -468,4 +468,42 @@ class UserController extends Controller
         $user->save();
         return $this->response(null,"Reset Password success",200);
     }
+
+    /**
+     *    @OA\Post(
+     *       path="/user/status/{id}",
+     *       tags={"User"},
+     *       operationId="user-status",
+     *       summary="Update User Status",
+     *       description="Update Statis User by ID",
+     *     @OA\Parameter(
+     *          name="id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Property(
+     *              type="string"
+     *          ),
+     *      ),
+     *     @OA\Response(
+     *           response="200",
+     *           description="Success",
+     *           @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
+     *     ),
+     *     @OA\Response(
+     *           response="500",
+     *           description="Failure",
+     *           @OA\JsonContent(type="object", ref="#/components/schemas/ResponseSchema"),
+     *     ),
+     *     security={
+     *          {"Bearer": {}}
+     *      }
+     * )
+     */
+    public function updateStatus(Request $request, $id) : JsonResponse
+    {
+        $user = User::whereId($id)->firstOrFail();
+        $user->is_active = $request->is_active;
+        $user->save();
+        return $this->response(null,"Update status success",200);
+    }
 }
