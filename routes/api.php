@@ -60,7 +60,6 @@ Route::middleware([
         Route::get("/iuran/{activity_id}/activity",[IuranController::class,'getUserIuranByActivity']);
         Route::get("/iuran/not/{activity_id}/activity",[IuranController::class,'getUserNotIuranByActivity']);
         Route::get("/iuran/month/xls",[IuranController::class,"exportIuran"]);
-        Route::get("/iuran/month",[IuranController::class,"getMonthIuran"]);
 
         // Program
         Route::get("/program",[ProgramController::class,'index']);
