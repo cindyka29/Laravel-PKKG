@@ -6,9 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * 
+ *
  *
  * @property string $id
  * @property string $name
@@ -48,5 +49,10 @@ class Activity extends Model
     public function program() : BelongsTo
     {
         return $this->belongsTo(Program::class,"program_id","id");
+    }
+
+    public function kas() : HasMany
+    {
+        return $this->HasMany(Kas::class,"activity_id","id");
     }
 }

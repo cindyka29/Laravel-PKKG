@@ -51,6 +51,8 @@ Route::middleware([
 
         // Iuran
         Route::post("/iuran",[IuranController::class,'store']);
+        Route::get("/iuran/report",[IuranController::class,'reportIuran']);
+        Route::get("/iuran/month",[IuranController::class,"getMonthIuran"]);
         Route::get("/iuran/user/{user_id}",[IuranController::class,'index']);
         Route::get("/iuran/{id}",[IuranController::class,'show']);
         Route::put("/iuran/{id}",[IuranController::class,'update']);
@@ -58,6 +60,7 @@ Route::middleware([
         Route::get("/iuran/{activity_id}/activity",[IuranController::class,'getUserIuranByActivity']);
         Route::get("/iuran/not/{activity_id}/activity",[IuranController::class,'getUserNotIuranByActivity']);
         Route::get("/iuran/month/xls",[IuranController::class,"exportIuran"]);
+        Route::get("/iuran/month",[IuranController::class,"getMonthIuran"]);
 
         // Program
         Route::get("/program",[ProgramController::class,'index']);

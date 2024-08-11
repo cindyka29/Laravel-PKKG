@@ -342,4 +342,63 @@ class IuranController extends Controller
         return Excel::download(new IuranExportXls($date,$records),'Laporan-Iuran-'.$date.'.xlsx');
         // return  $this->response($records,"Data Retrieved",200);
     }
+
+    public function getMonthIuran(Request $request) : JsonResponse
+    {
+        $validator = Validator::make($request->all(),[
+            "year" => "date_format:Y|nullable"
+        ]);
+        if($validator->fails()){
+            return $this->response($validator->getMessageBag(),"Invalid Input",400);
+        }
+        $year = $request->year;
+        $months = Iuran::selectRaw("DISTINCT(DATE_FORMAT(activities.date,'%M %Y')) as text, DATE_FORMAT(activities.date,'%Y-%m') as value")
+        ->leftJoin('activities', 'activities.id', '=', 'iurans.activity_id')
+        ->whereHas('activity', function ($query) use ($year) {
+            $query->where(function($q) use ($year){
+                if ($year && $year != ""){
+                    $q->whereRaw("DATE_FORMAT(date,'%Y') = '$year'");
+                }
+            });
+        })
+        ->get();
+        $data["records"] = $months;
+        return $this->response($data,"Data Retrieved",200);
+    }
+
+    public function reportIuran(Request $request) : JsonResponse
+    {
+        $validator = Validator::make($request->all(),[
+            "start_date" => "nullable|date_format:Y-m-d",
+        ]);
+        if($validator->fails()){
+            return $this->response($validator->getMessageBag(),"Invalid Input Data",400);
+        }
+        $start_date = $request->get("start_date") ?? null;
+        if ($start_date !== null) {
+            $validator = Validator::make($request->all(),[
+                "end_date" => "required|date_format:Y-m-d"
+            ]);
+            if($validator->fails()){
+                return $this->response($validator->getMessageBag(),"Invalid Input Data",400);
+            }
+        }
+        $end_date = $request->get("end_date") ?? null;
+        $query = Iuran::selectRaw("sum(nominal) as nominal, activities.date")
+        ->leftJoin('activities', 'activities.id', '=', 'iurans.activity_id')
+        ->leftJoin('kas', 'kas.activity_id', '=', 'activities.id')
+        ->where(function($q) use ($start_date,$end_date){
+            if ($start_date !== null && $end_date !== null){
+                $q->whereBetween('activities.date',[$start_date,$end_date]);
+            }
+        })
+        ->groupBy("activities.date");
+        $inQuery = clone $query;
+        $outQuery = clone $query;
+        $in = $inQuery->where("kas.type",'=','in')->get();
+        $out = $outQuery->where("kas.type",'=','out')->get();
+        $data['in'] = $in;
+        $data["out"] = $out;
+        return $this->response($data,"Data Retrieved",200);
+    }
 }
