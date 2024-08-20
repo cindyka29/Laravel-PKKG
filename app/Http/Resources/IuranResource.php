@@ -16,6 +16,7 @@ class IuranResource extends JsonResource
     {
         return [
             "is_paid" => $this->is_paid,
+            "nominal" => $this->nominal,
             "user_id" => $this->user_id,
             $this->mergeWhen($this->relationLoaded('user'),[
                 'user' => new UserResource($this->whenLoaded("user"))

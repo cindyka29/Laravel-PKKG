@@ -99,6 +99,7 @@ class IuranController extends Controller
         $iuran->user_id = $request->user_id;
         $iuran->activity_id = $request->activity_id;
         $iuran->is_paid = $request->is_paid;
+        $iuran->nominal = $request->nominal;
         $iuran->save();
 
         return $this->response(['record'=>new IuranResource($iuran)],"Record Saved",200);
@@ -191,7 +192,8 @@ class IuranController extends Controller
         $iuran = Iuran::whereId($id)->firstOrFail();
         $iuran->user_id = $request->user_id;
         $iuran->activity_id = $request->activity_id;
-        $iuran->is_present = $request->is_present;
+        $iuran->is_paid = $request->is_paid;
+        $iuran->nominal = $request->nominal;
         $iuran->save();
 
         return $this->response(['record' => new IuranResource($iuran)], "Data Updated", 200);
