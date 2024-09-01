@@ -15,6 +15,7 @@ class IuranResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            "id_iuran" => $this->id,
             "is_paid" => $this->is_paid,
             "nominal" => $this->nominal,
             "user_id" => $this->user_id,
