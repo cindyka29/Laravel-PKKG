@@ -28,6 +28,7 @@ Route::middleware([
         Route::get("/user/{id}",[UserController::class,"show"]);
         Route::put("/user/{id}",[UserController::class,"update"]);
         Route::delete("/user/{id}",[UserController::class,"destroy"]);
+        Route::post("/user/change-password/{id}",[UserController::class,"changePassword"]);
 
         // activity
         Route::get("/activity",[ActivityController::class,'index']);

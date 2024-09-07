@@ -506,4 +506,12 @@ class UserController extends Controller
         $user->save();
         return $this->response(null,"Update status success",200);
     }
+
+    public function changePassword(Request $request,  string $id)
+    {
+        $user = User::whereId($id)->firstOrFail();
+        $user->password = Hash::make($request->password);
+        $user->save();
+        return $this->response(null,"Reset Password success",200);
+    }
 }
