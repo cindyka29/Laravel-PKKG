@@ -271,8 +271,22 @@ class AbsenceController extends Controller
     {
         $activity = Activity::whereId($activity_id)->firstOrFail();
         $absences = Absence::with(["user"])->where('activity_id','=',$activity_id)->get();
+        $user_id = Absence::whereActivityId($activity_id)->get()->pluck("user_id")->toArray();
+        $allUser = User::where('role','!=','admin')->whereNotIn("id",$user_id)->get();
+        $additional_user = [];
+        foreach($allUser as $value){
+            $additional_user[] = [
+                "is_attended" => 0,
+                "user_id" => $value->id,
+                "user" => $value,
+                "activity_id" => $activity_id,
+                "updated_at" => null
+            ];
+        }
+
         $data['users'] = AbsenceResource::collection($absences);
         $data['activity'] = new ActivityResources($activity);
+        $data['users'] = $data['users']->merge($additional_user);
         return $this->response($data,"Data Retrieved",200);
     }
 
