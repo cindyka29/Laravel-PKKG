@@ -277,8 +277,25 @@ class IuranController extends Controller
     {
         $activity = Activity::whereId($activity_id)->firstOrFail();
         $absences = Iuran::with(["user"])->where('activity_id','=',$activity_id)->get();
+        $user_id = Iuran::with(["user"])->where('activity_id','=',$activity_id)->pluck("user_id")->toArray();
+
+        $allUser = User::where('role','!=','admin')->whereNotIn("id",$user_id)->get();
+        $additional_user = [];
+        foreach($allUser as $value){
+            $additional_user[] = [
+                "id_iuran" => null,
+                "is_paid" => 0,
+                "nominal" => 0,
+                "user_id" => $value->id,
+                "user" => $value,
+                "activity_id" => $activity_id,
+                "updated_at" => null
+            ];
+        }
+
         $data['users'] = IuranResource::collection($absences);
         $data['activity'] = new ActivityResources($activity);
+        $data['users'] = $data['users']->merge($additional_user);
         return $this->response($data,"Data Retrieved",200);
     }
 
