@@ -286,7 +286,11 @@ class AbsenceController extends Controller
 
         $data['users'] = AbsenceResource::collection($absences);
         $data['activity'] = new ActivityResources($activity);
-        $data['users'] = $data['users']->merge($additional_user);
+        if(count($data['users']) > 0){
+            $data['users'] = $data['users']->merge($additional_user);
+        }else{
+            $data['users'] = $additional_user;
+        }
         return $this->response($data,"Data Retrieved",200);
     }
 
