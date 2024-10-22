@@ -407,7 +407,7 @@ class IuranController extends Controller
             }
         }
         $end_date = $request->get("end_date") ?? null;
-        $query = Iuran::selectRaw("sum(nominal) as nominal, activities.date")
+        $query = Iuran::selectRaw("sum(iurans.nominal) as nominal, activities.date")
         ->leftJoin('activities', 'activities.id', '=', 'iurans.activity_id')
         ->leftJoin('kas', 'kas.activity_id', '=', 'activities.id')
         ->where(function($q) use ($start_date,$end_date){
@@ -418,8 +418,14 @@ class IuranController extends Controller
         ->groupBy("activities.date");
         $inQuery = clone $query;
         $outQuery = clone $query;
-        $in = $inQuery->where("kas.type",'=','in')->get();
-        $out = $outQuery->where("kas.type",'=','out')->get();
+        $in = $inQuery->where("kas.type",'=','in')->get()->map(function ($item) {
+            $item->nominal = (int) $item->nominal;
+            return $item;
+        });;
+        $out = $outQuery->where("kas.type",'=','out')->get()->map(function ($item) {
+            $item->nominal = (int) $item->nominal;
+            return $item;
+        });;
         $data['in'] = $in;
         $data["out"] = $out;
         return $this->response($data,"Data Retrieved",200);

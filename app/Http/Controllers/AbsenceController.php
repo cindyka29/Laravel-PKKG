@@ -48,11 +48,11 @@ class AbsenceController extends Controller
      *     }
      * )
      */
-    public function index($user_id) : JsonResponse
+    public function index($user_id): JsonResponse
     {
-        $users = Absence::with("activity")->where("user_id",'=',$user_id)->get();
+        $users = Absence::with('activity')->where('user_id', '=', $user_id)->get();
         $data['records'] = AbsenceResource::collection($users);
-        return $this->response($data,"Data Retrieved",200);
+        return $this->response($data, 'Data Retrieved', 200);
     }
 
     /**
@@ -88,16 +88,16 @@ class AbsenceController extends Controller
      *     }
      * )
      */
-    public function store(AbsenceRequest $request) : JsonResponse
+    public function store(AbsenceRequest $request): JsonResponse
     {
-        $absence = new Absence;
+        $absence = new Absence();
         $absence->id = Str::uuid();
         $absence->user_id = $request->user_id;
         $absence->activity_id = $request->activity_id;
         $absence->is_attended = $request->is_attended;
         $absence->save();
 
-        return $this->response(["record" => new AbsenceResource($absence)],"Record Saved",200);
+        return $this->response(['record' => new AbsenceResource($absence)], 'Record Saved', 200);
     }
 
     /**
@@ -133,10 +133,10 @@ class AbsenceController extends Controller
      *     }
      * )
      */
-    public function show($id) : JsonResponse
+    public function show($id): JsonResponse
     {
-        $absence = Absence::with(["user","activity"])->findOrFail($id);
-        return $this->response(["record"=>new AbsenceResource($absence)],"Data Retrieved",200);
+        $absence = Absence::with(['user', 'activity'])->findOrFail($id);
+        return $this->response(['record' => new AbsenceResource($absence)], 'Data Retrieved', 200);
     }
 
     /**
@@ -182,15 +182,24 @@ class AbsenceController extends Controller
      *     }
      * )
      */
-    public function update(AbsenceRequest $request, $id) : JsonResponse
+    public function update(AbsenceRequest $request, $id): JsonResponse
     {
-        $absence = Absence::whereId($id)->firstOrFail();
-        $absence->user_id = $request->user_id;
-        $absence->activity_id = $request->activity_id;
-        $absence->is_attended = $request->is_attended;
-        $absence->save();
+        $absence = Absence::whereId($id)->first();
+        if ($absence) {
+            $absence->user_id = $request->user_id;
+            $absence->activity_id = $request->activity_id;
+            $absence->is_attended = $request->is_attended;
+            $absence->save();
+        } else {
+            $absence = new Absence();
+            $absence->id = Str::uuid();
+            $absence->user_id = $request->user_id;
+            $absence->activity_id = $request->activity_id;
+            $absence->is_attended = $request->is_attended;
+            $absence->save();
+        }
 
-        return $this->response(["record"=>new AbsenceResource($absence)],"Record Updated",200);
+        return $this->response(['record' => new AbsenceResource($absence)], 'Record Updated', 200);
     }
 
     /**
@@ -226,12 +235,12 @@ class AbsenceController extends Controller
      *     }
      * )
      */
-    public function destroy($id) : JsonResponse
+    public function destroy($id): JsonResponse
     {
         $absence = Absence::whereId($id)->firstOrFail();
         $absence->delete();
 
-        return $this->response(null,"Record Deleted",200);
+        return $this->response(null, 'Record Deleted', 200);
     }
 
     /**
@@ -267,31 +276,33 @@ class AbsenceController extends Controller
      *     }
      * )
      */
-    public function getUserAbsentByActivity($activity_id) : JsonResponse
+    public function getUserAbsentByActivity($activity_id): JsonResponse
     {
         $activity = Activity::whereId($activity_id)->firstOrFail();
-        $absences = Absence::with(["user"])->where('activity_id','=',$activity_id)->get();
-        $user_id = Absence::whereActivityId($activity_id)->get()->pluck("user_id")->toArray();
-        $allUser = User::where('role','!=','admin')->whereNotIn("id",$user_id)->get();
+        $absences = Absence::with(['user'])
+            ->where('activity_id', '=', $activity_id)
+            ->get();
+        $user_id = Absence::whereActivityId($activity_id)->get()->pluck('user_id')->toArray();
+        $allUser = User::where('role', '!=', 'admin')->whereNotIn('id', $user_id)->get();
         $additional_user = [];
-        foreach($allUser as $value){
+        foreach ($allUser as $value) {
             $additional_user[] = [
-                "is_attended" => 0,
-                "user_id" => $value->id,
-                "user" => $value,
-                "activity_id" => $activity_id,
-                "updated_at" => null
+                'is_attended' => 0,
+                'user_id' => $value->id,
+                'user' => $value,
+                'activity_id' => $activity_id,
+                'updated_at' => null,
             ];
         }
 
         $data['users'] = AbsenceResource::collection($absences);
         $data['activity'] = new ActivityResources($activity);
-        if(count($data['users']) > 0){
+        if (count($data['users']) > 0) {
             $data['users'] = $data['users']->merge($additional_user);
-        }else{
+        } else {
             $data['users'] = $additional_user;
         }
-        return $this->response($data,"Data Retrieved",200);
+        return $this->response($data, 'Data Retrieved', 200);
     }
 
     /**
@@ -327,13 +338,13 @@ class AbsenceController extends Controller
      *     }
      * )
      */
-    public function getUserNotAbsentByActivity($activity_id) : JsonResponse
+    public function getUserNotAbsentByActivity($activity_id): JsonResponse
     {
         $activity = Activity::whereId($activity_id)->firstOrFail();
-        $user_id = Absence::whereActivityId($activity_id)->get()->pluck("user_id")->toArray();
-        $user = User::where('role','!=','admin')->whereNotIn("id",$user_id)->get();
+        $user_id = Absence::whereActivityId($activity_id)->get()->pluck('user_id')->toArray();
+        $user = User::where('role', '!=', 'admin')->whereNotIn('id', $user_id)->get();
         $data['users'] = UserResource::collection($user);
         $data['activity'] = new ActivityResources($activity);
-        return  $this->response($data,"Data Retrieved",200);
+        return $this->response($data, 'Data Retrieved', 200);
     }
 }

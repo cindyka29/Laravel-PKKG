@@ -17,7 +17,7 @@ class KasResource extends JsonResource
         return [
             'id' => $this->id,
             'activity_id' => $this->activity_id,
-            $this->mergeWhen($this->realtionLoaded("activity"),[
+            $this->mergeWhen($this->relationLoaded("activity"),[
                 "activity" => new ActivityResources($this->whenLoaded("activity"))
             ]),
             'keterangan' => $this->keterangan,

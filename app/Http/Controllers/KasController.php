@@ -491,15 +491,21 @@ class KasController extends Controller
             }
         }
         $end_date = $request->get("end_date") ?? null;
-        $query = Kas::selectRaw("sum(nominal) as nominal, date")
+        $query = Kas::selectRaw("CAST(sum(nominal) AS SIGNED) as nominal, date")
             ->where(function($q) use ($start_date,$end_date){
                 if ($start_date !== null && $end_date !== null){
                     $q->whereBetween('date',[$start_date,$end_date]);
                 }
             })
             ->groupBy("date");
-        $in = $query->where("type",'=','in')->get();
-        $out = $query->where("type",'=','out')->get();
+        $in = $query->where("type",'=','in')->get()->map(function ($item) {
+            $item->nominal = (int) $item->nominal;
+            return $item;
+        });;
+        $out = $query->where("type",'=','out')->get()->map(function ($item) {
+            $item->nominal = (int) $item->nominal;
+            return $item;
+        });;
         $data['in'] = $in;
         $data["out"] = $out;
         return $this->response($data,"Data Retrieved",200);
