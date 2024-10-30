@@ -392,6 +392,17 @@ class ActivityController extends Controller
         return $this->response(null,"Image Saved",200);
     }
 
+    public function getDocumentation($id) : JsonResponse
+    {
+        if($id = 'all'){
+            $activity = Activity::with('documentations')->get();
+        }else{
+            $activity = Activity::where('id', $id)->with('documentations')->get();
+        }
+
+        return $this->response($activity,"Data Retrieved",200);
+    }
+
     /**
      * @param $image_id
      * @return JsonResponse

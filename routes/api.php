@@ -38,6 +38,7 @@ Route::middleware([
         Route::delete("/activity/{id}",[ActivityController::class,'destroy']);
         Route::get("/activity-month",[ActivityController::class,'getByMonth']);
         Route::get("/activity-date",[ActivityController::class,'getByDate']);
+        Route::get("/activity/documentation/{id}",[ActivityController::class,'getDocumentation']);
         Route::post("/activity/documentation",[ActivityController::class,'addDocumentation']);
         Route::delete("/activity/documentation/{image_id}",[ActivityController::class,'deleteDocumentation']);
 
